@@ -36,6 +36,3 @@ Este repositório apresenta uma solução arquitetural para migrar um sistema le
    cd iac/ansible
    ansible-playbook deploy.yml
    ```
-
-## Contato
-Para dúvidas, entre em contato via [seu.email@exemplo.com](mailto:seu.email@exemplo.com).
