@@ -4,35 +4,34 @@ Solução Arquitetural para Migração de Sistema Legado para Modelo Híbrido co
 1. Contexto e Objetivo
 
 O desafio consiste em migrar um sistema legado para um modelo híbrido, integrando infraestrutura on-premises e a nuvem pública Azure. A solução atende aos requisitos de dimensionamento, FinOps, automação via IaC, e inclui um diagrama da topologia com justificativas tecnológicas. Diferenciais como Disaster Recovery, monitoramento e referência ao modelo OSI foram incorporados para robustez.
+
 2. Dimensionamento de Recursos
 2.1 Requisitos Estimados
 
 Com base em sistemas legados típicos, assumimos:
 
-    Carga de Trabalho: 500 usuários concorrentes, com picos de 20% adicionais.
-    Aplicação: Monolítica, com banco de dados relacional e serviços de API.
-    Tráfego: 10.000 requisições/hora, com 100 MB de dados por requisição em média.
-
+    Carga de Trabalho: 50 usuários concorrentes, com picos de 20% adicionais.
+    
 2.2 Configuração de Recursos
 
     On-Premises:
-        Servidores de Aplicação: 2 VMs com 4 vCPUs, 16 GB RAM cada (baseado em benchmarks de aplicações Java/.NET).
-        Banco de Dados: 1 servidor físico com 8 vCPUs, 32 GB RAM, armazenamento SSD de 500 GB (alta IOPS para queries SQL).
-        Escalabilidade Horizontal: Adição de VMs sob demanda via VMware vSphere.
+        Servidores de Aplicação: 2 VMs com 4 vCPUs, 16 GB RAM cada.
+        Banco de Dados: 1 servidor físico com 8 vCPUs, 32 GB RAM, armazenamento de 500 GB.
+        Escalabilidade Horizontal: Adição de VMs sob demanda via Hyper-V.
     Azure:
-        Azure Virtual Machines: 2 VMs D2s v5 (2 vCPUs, 8 GB RAM) em Virtual Machine Scale Sets, ajustando entre 2 e 4 instâncias com base em CPU > 70%.
-        Azure SQL Database: General Purpose, 2 vCores, 10 GB de armazenamento, com réplica de leitura para alta disponibilidade.
+        Azure Virtual Machines: 2 VMs D2s v5 (2 vCPUs, 8 GB RAM).
+        Azure SQL Database: General Purpose, 2 vCores, 10 GB de armazenamento;
         Armazenamento: Azure Blob Storage para arquivos estáticos, Premium SSD (P10, 500 IOPS) para discos das VMs.
-        Escalabilidade Vertical: Upgrade para D4s v5 em picos extremos.
-    Reserva de Capacidade: 20% de buffer em CPU e memória para imprevistos.
+        Reserva de Capacidade: 20% de buffer em CPU e memória para imprevistos.
 
 3. Estratégias de FinOps
 3.1 Otimização de Custos
 
     Azure Reservations: Compromisso de 1 ano para VMs, reduzindo custos em ~30%.
-    Spot VMs: Uso para tarefas não críticas (ex.: relatórios batch), com até 70% de economia.
+    Shape: Utilizar o shape adequado conforme necessidade da aplicação (CPU ou Memória).
     Blob Storage Lifecycle: Transição de arquivos para Cool tier após 90 dias.
     Right-Sizing: Monitoramento via Azure Advisor para ajustar recursos subutilizados.
+    Automation Account: Desligar os recursos em horários sem utilização.
     Tagging: Tags obrigatórias (ex.: "Projeto", "Ambiente") para rastreamento granular de custos.
 
 3.2 Governança
