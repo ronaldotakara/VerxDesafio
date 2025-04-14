@@ -40,37 +40,7 @@ Com base em sistemas legados típicos, assumimos:
     Budget Alerts: Alertas para gastos acima de 80% do orçamento.
     Reserved Instances: Reserva de Azure SQL Database para uso contínuo, com economia de ~25%.
 
-4. Diagrama da Topologia
-
-A topologia híbrida integra on-premises e Azure, com comunicação via VPN.
-text
-+---------------------+                     +---------------------+
-|    On-Premises      |                     |     Azure VNet      |
-| +-----------------+ |                     | +-----------------+ |
-| | App Servers     | | <---VPN (IPSec)--> | | VMs (Scale Sets) | |
-| | (VMware VMs)    | |                     | | D2s v5           | |
-| +-----------------+ |                     | +-----------------+ |
-| +-----------------+ |                     | +-----------------+ |
-| | Database (SQL)  | | <---Replication--> | | Azure SQL DB     | |
-| | 8 vCPUs, 32GB   | |                     | | General Purpose  | |
-| +-----------------+ |                     | +-----------------+ |
-+---------------------+                     | +-----------------+ |
-                                            | | Blob Storage     | |
-                                            | +-----------------+ |
-                                            | +-----------------+ |
-                                            | | Azure Monitor    | |
-                                            | +-----------------+ |
-                                            +---------------------+
-
-Descrição:
-
-    On-Premises: Hospeda aplicação principal e banco primário para baixa latência local.
-    Azure: Hospeda réplicas da aplicação e banco para escalabilidade e redundância.
-    VPN: Conexão segura via Azure VPN Gateway.
-    Blob Storage: Armazena arquivos estáticos, reduzindo carga local.
-    Azure Monitor: Monitoramento centralizado.
-
-5. Justificativa das Escolhas Tecnológicas
+4.  Justificativa das Escolhas Tecnológicas
 
     Azure: Escolhida por sua integração com sistemas legados (Azure Hybrid Benefit), suporte a ambientes híbridos (VPN Gateway, Azure Arc) e ferramentas de FinOps (Cost Management, Advisor). Alternativas como AWS ou GCP foram consideradas, mas Azure oferece maior compatibilidade com stacks Microsoft, comuns em sistemas legados.
     VMs D2s v5: Custo-benefício ideal, com suporte a cargas variáveis.
@@ -79,8 +49,8 @@ Descrição:
     Terraform: Automação de IaC para consistência entre ambientes.
     Ansible: Configuração de servidores para padronização.
 
-6. Automação via IaC
-6.1 Terraform
+5. Automação via IaC
+5.1 Terraform
 
 Exemplo de código para provisionar VMs e Azure SQL Database:
 <xaiArtifact artifact_id="06196707-71be-4427-9392-559f55089f79" artifact_version_id="ff4f0710-c28e-43d5-b7ca-8f4af66a4402" title="main.tf" contentType="text/x-terraform"> provider "azurerm" { features {} }
@@ -109,8 +79,8 @@ location            = "eastus"
 server_name         = azurerm_sql_server.main.name
 }
 
-7. Diferenciais
-7.1 Plano de Disaster Recovery
+6. Diferenciais
+6.1 Plano de Disaster Recovery
 
     RPO/RTO: Objetivo de RPO de 15 minutos e RTO de 1 hora.
     Geo-Replication: Azure SQL Database com réplica em outra região.
@@ -118,22 +88,12 @@ server_name         = azurerm_sql_server.main.name
     Failover: Scripts Terraform para promover réplica SQL como primária.
     Testes: Simulações trimestrais de failover.
 
-7.2 Monitoramento
+6.2 Monitoramento
 
     Azure Monitor: Métricas de CPU, memória e latência, com alertas para >80% de uso.
     Prometheus + Grafana: Implantado on-premises para monitoramento detalhado de VMs.
     Logs: Centralização via Azure Log Analytics e ELK Stack local.
 
-7.3 Modelo OSI
-
-A solução mapeia as camadas do modelo OSI:
-
-    Camada 1 (Física): Data centers on-premises e Azure com redundância de energia.
-    Camada 2 (Enlace): Switches gerenciados on-premises e subnets na Azure VNet.
-    Camada 3 (Rede): VPN IPSec para roteamento seguro.
-    Camada 4 (Transporte): Azure Load Balancer com TCP/UDP.
-    Camada 5-7 (Sessão, Apresentação, Aplicação): Aplicação monolítica com APIs REST.
-
-8. Conclusão
+7. Conclusão
 
 A solução híbrida com Azure equilibra desempenho, custo e resiliência, utilizando a nuvem para escalabilidade e on-premises para baixa latência. Ferramentas como Terraform e Ansible garantem automação, enquanto FinOps e monitoramento otimizam recursos. Diferenciais como DR e modelo OSI agregam robustez, atendendo aos requisitos do desafio.
