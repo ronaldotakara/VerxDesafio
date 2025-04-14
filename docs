@@ -1,1 +1,30 @@
+# Solução Arquitetural para Migração Híbrida
 
+## 1. Visão Geral
+A solução migra um sistema legado para um modelo híbrido, combinando infraestrutura on-premises e Azure. Atende aos requisitos de dimensionamento, FinOps, automação, e inclui diferenciais como Disaster Recovery e monitoramento.
+
+## 2. Dimensionamento
+- **On-Premises**: 2 VMs (4 vCPUs, 16 GB RAM) e banco SQL (8 vCPUs, 32 GB RAM).
+- **Azure**: 2 VMs D2s v5 em Scale Sets, Azure SQL Database (2 vCores).
+- **Escalabilidade**: Auto Scaling com base em CPU > 70%, buffer de 20%.
+
+## 3. FinOps
+- **Otimização**: Azure Reservations, Spot VMs, Blob Storage Lifecycle.
+- **Governança**: Azure Cost Management, alertas de orçamento, tagging.
+
+## 4. Topologia
+![Diagrama da Topologia](topology_diagram.png)
+
+## 5. Tecnologias
+- **Azure**: Integração híbrida via VPN Gateway e Azure Arc.
+- **IaC**: Terraform para provisionamento, Ansible para configuração.
+- **Justificativa**: Azure é ideal para stacks Microsoft e oferece ferramentas robustas de FinOps.
+
+## 6. Automação
+- **Terraform**: Provisiona VMs e Azure SQL Database (veja `iac/terraform/`).
+- **Ansible**: Configura servidores (veja `iac/ansible/`).
+
+## 7. Diferenciais
+- **Disaster Recovery**: RPO de 15 min, RTO de 1h, com geo-replicação.
+- **Monitoramento**: Azure Monitor e Prometheus/Grafana.
+- **Modelo OSI**: Camadas mapeadas (física, enlace, rede, etc.).
